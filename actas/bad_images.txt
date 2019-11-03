@@ -1,0 +1,5 @@
+bad image: mesas/605731.jpg 
+bad image: mesas/103681.jpg 
+bad image: mesas/217071.jpg 
+bad image: mesas/102421.jpg 
+bad image: mesas/104181.jpg 
