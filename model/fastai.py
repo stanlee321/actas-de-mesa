@@ -27,8 +27,10 @@ class MyModel:
         empty_data = ImageDataBunch.load_empty(base_path) #this will look for a file named export.pkl in the specified path
     
         self.learner = cnn_learner(empty_data, arch).load(MODEL_PATH)
-        
-        
+        try:
+            self.learner.model.cuda()
+        except:
+            print("NO GPU FOUND....")
         self.BINARY_THREHOLD = 180
 
 
