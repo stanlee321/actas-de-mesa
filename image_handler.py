@@ -259,172 +259,171 @@ class ImageHanlder:
         
 
         for i_path in images_list:
+
             print(f"IMAGE : {i_path}")
-        #try:
-            # Try to open the image
-            #i = "actas/mesas/200081.jpg"
-            img     =   cv2.imread(i_path)
 
-            img_r   =   self.norm_image(img)
-            # extract only the votation box
-            c_image =   self.cut_image(img_r, self.P1, self.P2)
+            try:
+                # Try to open the image
+                #i = "actas/mesas/200081.jpg"
+                img     =   cv2.imread(i_path)
 
-            # Obtain the full filename
-            filename = i_path.split("/")[-1]
+                img_r   =   self.norm_image(img)
+                # extract only the votation box
+                c_image =   self.cut_image(img_r, self.P1, self.P2)
 
-            # Obtain only the name without extension 
-            filename_two = filename.split(".")[0]
-            
-            # Find the contours box rectangle for each partido 
-            cont_img, self.outputs = self.find_contour(c_image, i_path)
-            
-            for o in self.outputs:
-                # Iterate over the rectangular boxes
-                for k,v in o.items():
-                    #print(f"WORKING ON {k}")
-                    partido_key_id = k  
-                    
-                    p1, p2 = v
+                # Obtain the full filename
+                filename = i_path.split("/")[-1]
 
-                    if k in self.partidos_todos:
-                        # Mueva Position tira 
-                        n_p1 = (p1[0] + 340, p1[1])
-                        n_p2 = (p2[0] + 180, p2[1])
-
-                    if k in self.otros_todos:
-
-                        # Mueva Position tira 
-                        n_p1 = (p1[0] + 310, p1[1])
-                        n_p2 = (p2[0] + 215, p2[1])
-
-                    #self.draw_rectangle_numpy(cont_img, n_p1, n_p2 )
-                    
-                    # Letters as image |X|X|X|
-                    #numbers_cout = self.cut_image(cont_img,  n_p1, n_p2)
-
-                    x = n_p1[0]
-                    y = n_p1[1]
-
-                    w = n_p2[0]
-                    h = n_p2[1]
-
-
-                    numbers_cout = cont_img[y:h, x:w]
-
-                    # Find again the letters with the contour detector:
-                    l_h, l_w, _ = numbers_cout.shape
-                    
-                    # Attempt to cut each letter
-                    votes = []
-
-                    for i in range(0,3):
-
-                        # Sliding x-window
-                        x0 = i*50 + 5
-                        x1 = (i+1)*50 + 5
-
-                        # New Points
-                        p1_l = (x0, 0)
-                        p2_l = (x1, l_h)
+                # Obtain only the name without extension 
+                filename_two = filename.split(".")[0]
+                
+                # Find the contours box rectangle for each partido 
+                cont_img, self.outputs = self.find_contour(c_image, i_path)
+                
+                for o in self.outputs:
+                    # Iterate over the rectangular boxes
+                    for k,v in o.items():
+                        #print(f"WORKING ON {k}")
+                        partido_key_id = k  
                         
-                        if (self.draw_rects):
-                            cv2.rectangle(numbers_cout, p1_l, p2_l, (244, 255, 0), 2)
-                            cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}.jpg", numbers_cout)
+                        p1, p2 = v
 
+                        if k in self.partidos_todos:
+                            # Mueva Position tira 
+                            n_p1 = (p1[0] + 340, p1[1])
+                            n_p2 = (p2[0] + 180, p2[1])
+
+                        if k in self.otros_todos:
+
+                            # Mueva Position tira 
+                            n_p1 = (p1[0] + 310, p1[1])
+                            n_p2 = (p2[0] + 215, p2[1])
+
+                        #self.draw_rectangle_numpy(cont_img, n_p1, n_p2 )
                         
-                        # Adjust each letter to his aprox box
-                        if (i == 0):
-                            p1_l_n = (p1_l[0]-5, p1_l[1])
-                            p2_l_n = (p2_l[0], p2_l[1]-5)
-                            letter = self.cut_image(numbers_cout, p1_l_n, p2_l_n, simple=True)
-                        elif (i == 1):
-                            p1_l_n = (p1_l[0]-5, p1_l[1])
-                            p2_l_n = (p2_l[0]-45, p2_l[1]-1) #from  (p2_l[0]-50, p2_l[1]-3)
+                        # Letters as image |X|X|X|
+                        #numbers_cout = self.cut_image(cont_img,  n_p1, n_p2)
+
+                        x = n_p1[0]
+                        y = n_p1[1]
+
+                        w = n_p2[0]
+                        h = n_p2[1]
+
+
+                        numbers_cout = cont_img[y:h, x:w]
+
+                        # Find again the letters with the contour detector:
+                        l_h, l_w, _ = numbers_cout.shape
+                        
+                        # Attempt to cut each letter
+                        votes = []
+
+                        for i in range(0,3):
+
+                            # Sliding x-window
+                            x0 = i*50 + 5
+                            x1 = (i+1)*50 + 5
+
+                            # New Points
+                            p1_l = (x0, 0)
+                            p2_l = (x1, l_h)
                             
-                            letter = self.cut_image(numbers_cout, p1_l_n, p2_l_n,simple=True)
-                        else:
-                            p2_l_n = (p2_l[0]-120, p2_l[1]+10)
-                            p2_l_n = (p2_l[0]+3, p2_l[1]+3)
-                            letter = self.cut_image(numbers_cout, p1_l, p2_l_n, simple=True)
+                            if (self.draw_rects):
+                                cv2.rectangle(numbers_cout, p1_l, p2_l, (244, 255, 0), 2)
+                                cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}.jpg", numbers_cout)
 
-                        # Load MNIST PyTorch Model
-                        # Convert to grayscale and apply Gaussian filtering
+                            
+                            # Adjust each letter to his aprox box
+                            if (i == 0):
+                                p1_l_n = (p1_l[0]-5, p1_l[1])
+                                p2_l_n = (p2_l[0], p2_l[1]-5)
+                                letter = self.cut_image(numbers_cout, p1_l_n, p2_l_n, simple=True)
+                            elif (i == 1):
+                                p1_l_n = (p1_l[0]-5, p1_l[1])
+                                p2_l_n = (p2_l[0]-45, p2_l[1]-1) #from  (p2_l[0]-50, p2_l[1]-3)
+                                
+                                letter = self.cut_image(numbers_cout, p1_l_n, p2_l_n,simple=True)
+                            else:
+                                p2_l_n = (p2_l[0]-120, p2_l[1]+10)
+                                p2_l_n = (p2_l[0]+3, p2_l[1]+3)
+                                letter = self.cut_image(numbers_cout, p1_l, p2_l_n, simple=True)
 
-                        # l_contours = self.find_contours_leters(letter)
-                        # for rect in l_contours:
+                            # Load MNIST PyTorch Model
+                            # Convert to grayscale and apply Gaussian filtering
 
-                        prediction = self.model.main_prediction(letter)
-                        #print(f"THIS PREDICTION for {partido_key_id}: {prediction}")
-                        votes.append(prediction)
-                        # cv2.putText(im2,partido_id, tuple(b[0]), self.font, 
-                        #                                 self.fontScale,
-                        #                                 self.fontColor,
-                        #                                 self.lineType)
+                            # l_contours = self.find_contours_leters(letter)
+                            # for rect in l_contours:
 
-                        if self.cut_numbers:
-                            # Path where save the digit numbers
-                            path = "actas/cuts/partidos/numbers/i_letter/"
-                            os.makedirs(path, exist_ok=True)
-                            full_path = f"{path}{k}-{i}-{filename}"
-                            # Save
-                            print(f"Saving letter to... {full_path}")
-                            #cv2.imwrite(full_path, letter)
-                    
-                    self.data_handler.append({partido_key_id: [votes, v]})       
-                    #  save tiras
-                    #cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}-.jpg", numbers_cout)
-                    
-                _file_name_log = "results_log"
+                            prediction = self.model.main_prediction(letter)
+                            #print(f"THIS PREDICTION for {partido_key_id}: {prediction}")
+                            votes.append(prediction)
+                            # cv2.putText(im2,partido_id, tuple(b[0]), self.font, 
+                            #                                 self.fontScale,
+                            #                                 self.fontColor,
+                            #                                 self.lineType)
 
-                for p in self.data_handler:
-                    for k,v in p.items():
-                        partido_id_name = k
-                        my_predictions, points = v
+                            if self.cut_numbers:
+                                # Path where save the digit numbers
+                                path = "actas/cuts/partidos/numbers/i_letter/"
+                                os.makedirs(path, exist_ok=True)
+                                full_path = f"{path}{k}-{i}-{filename}"
+                                # Save
+                                print(f"Saving letter to... {full_path}")
+                                #cv2.imwrite(full_path, letter)
+                        
+                        self.data_handler.append({partido_key_id: [votes, v]})       
+                        #  save tiras
+                        #cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}-.jpg", numbers_cout)
+                        
+                    _file_name_log = "results_log"
 
-                        # join number predictions
-                        my_vote = ""
-                        for p in my_predictions:
-                            print(f"PREDIS {p}")
-                            if p == 10:
-                                p = ""
-                            my_vote = my_vote + str(p)
+                    for p in self.data_handler:
+                        for k,v in p.items():
+                            partido_id_name = k
+                            my_predictions, points = v
 
-                        p1, p2 = points
+                            # join number predictions
+                            my_vote = ""
+                            for p in my_predictions:
+                                print(f"PREDIS {p}")
+                                if p == 10:
+                                    p = ""
+                                my_vote = my_vote + str(p)
 
-                        p_text = (p2[0]-25, p2[1])
-                        cv2.putText(cont_img, my_vote, tuple(p_text), self.font, 
-                                                        self.fontScale,
-                                                        self.fontColor,
-                                                        self.lineType)
+                            p1, p2 = points
 
-                        self.write_row_results_log(_file_name_log, 
-                                                        filename,
-                                                        my_vote,
-                                                        partido_id_name)
+                            p_text = (p2[0]-25, p2[1])
+                            cv2.putText(cont_img, my_vote, tuple(p_text), self.font, 
+                                                            self.fontScale,
+                                                            self.fontColor,
+                                                            self.lineType)
 
-                self.data_handler=[]
+                            self.write_row_results_log(_file_name_log, 
+                                                            filename,
+                                                            my_vote,
+                                                            partido_id_name)
 
-                # Write the acta with the number of results drawed on it.
-                if self.draw_results:
-                    base_path = "actas/cuts/"
+                    self.data_handler=[]
 
-                    os.makedirs(base_path, exist_ok=True)
-                    path = f"{base_path}{filename}"
-                    print(f"SAVING IMAGE PRO en {path}")
-                    cv2.imwrite(path, cont_img)
+                    # Write the acta with the number of results drawed on it.
+                    if self.draw_results:
+                        base_path = "actas/cuts/"
+
+                        os.makedirs(base_path, exist_ok=True)
+                        path = f"{base_path}{filename}"
+                        print(f"SAVING IMAGE PRO en {path}")
+                        cv2.imwrite(path, cont_img)
             #break
-            # except Exception as e:
-            #     filename = i_path.split("/")[-1]
-            #     _filename_error = "errorInOpenFile"
-            #     self.write_row_debug_log(_filename_error, filename, e)
-            #     print(e)
-
-            # except Exception as e:
-            #     print(e)
+            except Exception as e:
+                filename = i_path.split("/")[-1]
+                _filename_error = "errorInOpenFile"
+                self.write_row_debug_log(_filename_error, filename, e)
+                print(e)
 
 
 
-            
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Actas de mesa to counts')
