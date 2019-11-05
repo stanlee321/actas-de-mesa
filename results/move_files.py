@@ -5,7 +5,7 @@ import shutil
 
 def main():
     file_list = glob.glob("./*.jpg")
-    #print(len(file_list))
+    print(len(file_list))
 
     for path in file_list:
         file_name = path.split(".jpg")[0]
