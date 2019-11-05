@@ -87,7 +87,7 @@ class ImageHanlder:
         #self.partidos_todos = self.partidos.extend(self.partidos_d)
         self.todos_los_fields = self.partidos + self.partidos_d + self.otros + self.otros_d
 
-        print(len(self.todos_los_fields))
+        #print(len(self.todos_los_fields))
 
     def write_row_debug_log(self, file_name, path_img, label):
         """
@@ -250,7 +250,7 @@ class ImageHanlder:
         w = p2[0] - p1[0]
         h = p2[1] - p1[1]
         area = w*h
-        print(area)
+        #print(area)
         return area
     
     def draw_rectangle_numpy(self, img, p1,p2):
@@ -380,7 +380,7 @@ class ImageHanlder:
                     for p in self.data_handler:
                         for k,v in p.items():
                             partido_id_name = k
-                            print(f"KEY {partido_id_name}")
+                            #print(f"KEY {partido_id_name}")
                             my_predictions, points = v
 
                             # join number predictions
