@@ -90,7 +90,7 @@ class MyModel:
 
         # #print(pred)
 
-        path = f"./results/{self.preds_output_path}{self.counter}-{pred}-i.jpg"
+        path = f"./results/preds/{self.counter}-{pred}-i.jpg"
         # path_2 = f"./results/{self.counter}-{pred}.jpg"
 
         cv2.imwrite(path, img_i)
