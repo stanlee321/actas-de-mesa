@@ -11,6 +11,7 @@ def main():
         file_name = path.split(".jpg")[0]
         #print(file_name)
         name_label = file_name.split("-")
+        print(name_label)
         if len(name_label) == 2:
             #label = name_label[0]
             label =name_label[-1]
