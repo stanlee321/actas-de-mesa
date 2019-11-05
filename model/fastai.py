@@ -33,6 +33,9 @@ class MyModel:
             print("NO GPU FOUND....")
         self.BINARY_THREHOLD = 180
 
+        self.preds_output_path = "./results/preds/"
+        os.makedirs(self.preds_output_path, exist_ok=True)
+
 
     def image_smoothening(self, img):
         ret1, th1 = cv2.threshold(img,self.BINARY_THREHOLD, 255, cv2.THRESH_BINARY)
@@ -79,6 +82,7 @@ class MyModel:
         img_or_r = cv2.resize(img_or, (28,28))
 
         img = self.imageToTensorImage(img_or_r)
+
         pred = self.learner.predict(img)[0]
 
 
@@ -86,7 +90,7 @@ class MyModel:
 
         # #print(pred)
 
-        path = f"./results/{self.counter}-{pred}-i.jpg"
+        path = f"./results/{self.preds_output_path}{self.counter}-{pred}-i.jpg"
         # path_2 = f"./results/{self.counter}-{pred}.jpg"
 
         cv2.imwrite(path, img_i)
