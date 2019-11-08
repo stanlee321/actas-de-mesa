@@ -8,6 +8,8 @@ from tqdm import tqdm
 from model.fastai import MyModel
 import argparse
 
+# sorter
+from operator import itemgetter
 
 class Partido:
     def __init__(self, name="", box_name=[], box_count=[]):
@@ -60,7 +62,7 @@ class ImageHanlder:
         # P2 : 520,90
         
         # Region containing the information about the Mesas to count
-        self.P1 = (90*4, 98*4)
+        self.P1 = (85*4, 98*4)
         self.P2 = (272*4, 218*4)
         
         
@@ -82,6 +84,21 @@ class ImageHanlder:
 
         self.fixed = fixed
 
+        self.interchange = False
+        self.inter_change = {
+            2:1,
+            4:3,
+            6:5,
+            8:7,
+            10:9,
+            12:11,
+            14:13,
+            16:15,
+            18:17,
+            20:19,
+            22:21,
+            24:23,
+        }
     def combine_lists(self):
           # combine all the info
         #self.partidos_todos = self.partidos.extend(self.partidos_d)
@@ -176,42 +193,63 @@ class ImageHanlder:
         # Iterate over all contours
         for cnt in contours:
             x, y, w, h = cv2.boundingRect(cnt)
+
             p1 = (x, y)
             p2 = (x + w, y + h)
 
             deltax = p2[0]-p1[0]
             deltay = p2[1]-p1[1]
 
+            # in range? of a box?
             if (200<=(deltax)<=360) and (30<=(deltay)<=70):
                 # print(deltax)
                 # print(deltay)
                 p1 = (p1[0], p1[1])
-                p2 = (p2[0] + 210*0, p2[1])
+                p2 = (p2[0], p2[1])
 
                 boxes.append([p1,p2])
                 
                 if (self.draw_rects):
                     cv2.rectangle(im2, p1, p2, (0, 255, 0), 2)
-        
+
+        def sortSecond(val): 
+            return val[0]
+
         size = len(boxes)
         #print(f"TOTAL BOXES {size}")
-        
+        #boxes.sort(key=sortSecond)
+        #print(boxes)
         # If all the rectanguler boxes was found.
         if size == 24:
             # print("size",size)
 
             # Iterate over the rectangular boxes
             for i, b in enumerate(boxes):
-                
-                partido_id = str(i+1)
-                
-                outputs.append({i+1: b})
+                index_or = i
 
-                if self.cut_numbers:
-                    cv2.putText(im2, partido_id, tuple(b[0]), self.font, 
-                                                    self.fontScale,
-                                                    self.fontColor,
-                                                    self.lineType)
+                out_index = index_or + 1
+                partido_id = str(out_index)
+
+                point  = b[0]
+
+                h,w,c = image.shape
+                half_x = w / 2
+
+                if (int(partido_id) in [2,4,6,8,10,12,14,16,18,20, 22, 24]) and ( point[0] < half_x):
+
+                    out_index -= 1
+
+                if (int(partido_id) in [1,3,5,7,9,11,13,15,17,19, 21, 23]) and ( point[0] > half_x):
+                    out_index += 1
+
+                outputs.append({out_index: b})
+
+                """
+                cv2.putText(im2, partido_id, tuple(point), self.font, 
+                                                self.fontScale,
+                                                self.fontColor,
+                                                self.lineType)
+                """
         else:
             """
             If detection is < 24 log this file
@@ -262,6 +300,8 @@ class ImageHanlder:
 
         for i_path in tqdm(images_list, ascii=True, desc="Reading..."):
             print(f"IMAGE : {i_path}")
+            self.interchange = False
+
             try:
                 # Try to open the image
                 #i = "actas/mesas/200081.jpg"
@@ -357,7 +397,7 @@ class ImageHanlder:
 
                             # l_contours = self.find_contours_leters(letter)
                             # for rect in l_contours:
-
+                            print(f"MY LATTER SHAPE {letter.shape} -  {partido_key_id}")
                             prediction = self.model.main_prediction(letter)
                             #print(f"THIS PREDICTION for {partido_key_id}: {prediction}")
                             votes.append(prediction)
@@ -424,13 +464,12 @@ class ImageHanlder:
                     path = f"{base_path}{filename}"
                     print(f"SAVING IMAGE PRO en {path}")
                     cv2.imwrite(path, cont_img)
-
+                
             except Exception as e:
                 filename = i_path.split("/")[-1]
                 _filename_error = "errorInOpenFile"
                 self.write_row_debug_log(_filename_error, filename, e)
                 print(e)
-
             #break
 
 def load_fixed_data(path):
@@ -448,7 +487,7 @@ if __name__ == "__main__":
     parser.add_argument('--draw_results', type=bool,default=True, help='Input dir for videos')
     parser.add_argument('--all_boxes', type=bool, default=True, help='Output dir for image')
     
-    parser.add_argument("--fixes", type=str, default="./fixed_list.data", help="If you are augmenting the fixed data list" )
+    parser.add_argument("--fixes", type=str, default="", help="If you are augmenting the fixed data list" )
     
     args = parser.parse_args()
 
@@ -460,11 +499,16 @@ if __name__ == "__main__":
     all_boxes= args.all_boxes
     
     fixed_list_path = args.fixes
-    fixed_list = load_fixed_data(fixed_list_path)
+
+    if fixed_list_path != "":
+        fixed_list = load_fixed_data(fixed_list_path)
+    else:
+        fixed_list = []
 
     if (len(fixed_list) > 0):
         images_list = fixed_list
         fixed = True
+
     else:
         # Images lists...
         images_list = glob.glob(f"{images_path}*.jpg")

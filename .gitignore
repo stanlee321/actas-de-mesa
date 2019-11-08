@@ -24,3 +24,4 @@ model/models_fastai/models/resnet50_stage2.pth
 model/models_fastai/models/resnet50_stage1.pth
 results/errorInOpenFile.txt
 results/results_log.txt
+results/preds/
