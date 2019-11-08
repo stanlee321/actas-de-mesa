@@ -25,3 +25,4 @@ model/models_fastai/models/resnet50_stage1.pth
 results/errorInOpenFile.txt
 results/results_log.txt
 results/preds/
+results/detect_boxes_error_log.txt

@@ -408,7 +408,7 @@ class ImageHanlder:
                                 os.makedirs(path, exist_ok=True)
                                 full_path = f"{path}{k}-{i}-{filename}"
                                 # Save
-                                print(f"Saving letter to... {full_path}")
+                                #print(f"Saving letter to... {full_path}")
                                 #cv2.imwrite(full_path, letter)
                         
                         self.data_handler.append({partido_key_id: [votes, v]})       
@@ -433,7 +433,7 @@ class ImageHanlder:
 
                             p1, p2 = points
 
-                            p_text = (p2[0]-25, p2[1])
+                            p_text = (p2[0]-15, p2[1])
 
                             cv2.putText(cont_img, my_vote, tuple(p_text), self.font, 
                                                             self.fontScale,
