@@ -397,7 +397,7 @@ class ImageHanlder:
 
                             # l_contours = self.find_contours_leters(letter)
                             # for rect in l_contours:
-                            print(f"MY LATTER SHAPE {letter.shape} -  {partido_key_id}")
+                            #print(f"MY LATTER SHAPE {letter.shape} -  {partido_key_id}")
                             prediction = self.model.main_prediction(letter)
                             #print(f"THIS PREDICTION for {partido_key_id}: {prediction}")
                             votes.append(prediction)
