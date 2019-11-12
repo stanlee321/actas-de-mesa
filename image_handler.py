@@ -62,7 +62,7 @@ class ImageHanlder:
         # P2 : 520,90
         
         # Region containing the information about the Mesas to count
-        self.P1 = (85*4, 98*4)
+        self.P1 = (90*4, 98*4)
         self.P2 = (272*4, 218*4)
         
         
@@ -230,17 +230,17 @@ class ImageHanlder:
                 out_index = index_or + 1
                 partido_id = str(out_index)
 
-                point  = b[0]
+                # point  = b[0]
 
-                h,w,c = image.shape
-                half_x = w / 2
+                # h,w,c = image.shape
+                # half_x = w / 2
 
-                if (int(partido_id) in [2,4,6,8,10,12,14,16,18,20, 22, 24]) and ( point[0] < half_x):
+                # if (int(partido_id) in [2,4,6,8,10,12,14,16,18,20, 22, 24]) and ( point[0] < half_x):
 
-                    out_index -= 1
+                #     out_index -= 1
 
-                if (int(partido_id) in [1,3,5,7,9,11,13,15,17,19, 21, 23]) and ( point[0] > half_x):
-                    out_index += 1
+                # if (int(partido_id) in [1,3,5,7,9,11,13,15,17,19, 21, 23]) and ( point[0] > half_x):
+                #     out_index += 1
 
                 outputs.append({out_index: b})
 
@@ -342,7 +342,7 @@ class ImageHanlder:
                             n_p1 = (p1[0] + 310, p1[1])
                             n_p2 = (p2[0] + 215, p2[1])
 
-                        #self.draw_rectangle_numpy(cont_img, n_p1, n_p2 )
+                        self.draw_rectangle_numpy(cont_img, n_p1, n_p2 )
                         
                         # Letters as image |X|X|X|
                         #numbers_cout = self.cut_image(cont_img,  n_p1, n_p2)
@@ -372,9 +372,8 @@ class ImageHanlder:
                             p1_l = (x0, 0)
                             p2_l = (x1, l_h)
                             
-                            if (self.draw_rects):
-                                cv2.rectangle(numbers_cout, p1_l, p2_l, (244, 255, 0), 2)
-                                cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}.jpg", numbers_cout)
+                            cv2.rectangle(numbers_cout, p1_l, p2_l, (244, 255, 0), 2)
+                            #cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}.jpg", numbers_cout)
 
                             
                             # Adjust each letter to his aprox box
@@ -470,7 +469,7 @@ class ImageHanlder:
                 _filename_error = "errorInOpenFile"
                 self.write_row_debug_log(_filename_error, filename, e)
                 print(e)
-            #break
+            break
 
 def load_fixed_data(path):
     with open(f'{path}', 'rb') as filehandle:
