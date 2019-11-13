@@ -10,6 +10,8 @@ import argparse
 
 # sorter
 from operator import itemgetter
+from pascal_voc_writer import Writer
+
 
 class Partido:
     def __init__(self, name="", box_name=[], box_count=[]):
@@ -28,7 +30,7 @@ class ValidosAndOthers:
 class ImageHanlder:
     def __init__(self, cut_numbers=True, draw_results=False, all_boxes=True, draw_rects=False, fixed=False):
         self.font                   = cv2.FONT_HERSHEY_SIMPLEX
-        self.fontScale              = 1
+        self.fontScale              = 0.5
         self.fontColor              = (255,0,255)
         self.lineType               = 2
 
@@ -85,6 +87,64 @@ class ImageHanlder:
 
         self.fixed = fixed
 
+        self.normal_shape = (2500, 1600)
+
+
+        self.name_maping = {
+            1: "Votos Nulos Presidente",
+            2: "Votos Nulos Diputado",
+            3: "Votos Blancos Presidente",
+            4: "Votos Blancos Diputado",
+            5: "Votos Validos Presidente",
+            6: "Votos Validos Diputado",
+            7: "PAN-BOL Presidente",
+            8: "PAN-BOL Diputado",
+            9: "MNR Presidente",
+            10: "MNR Diputado",
+            11: "PDC Presidente",
+            12: "PDC Diputado",
+            13: "21F Presidente",
+            14: "21F Diputado ",
+            15: "MAS IPSP Presidente",
+            16: "MAS IPSP Diputado",
+            17: "UCS Presidente" ,
+            18: "UCS Diputado",
+            19: "MTS Presidente",
+            20: "MTS Diputado",
+            21: "FPV Presidente",
+            22: "FPV Diputado",
+            23: "CC Presidente",
+            24: "CC Diputado"
+        }
+
+        self.name_maping_results = {
+            25: "Votos Nulos Presidente, Result",
+            26: "Votos Nulos Diputado, Result",
+            27: "Votos Blancos Presidente, Result",
+            28: "Votos Blancos Diputado, Result",
+            29: "Votos Validos Presidente, Result",
+            30: "Votos Validos Diputado, Result",
+            31: "PAN-BOL Presidente, Result",
+            32: "PAN-BOL Diputado, Result",
+            33: "MNR Presidente, Result",
+            34: "MNR Diputado, Result",
+            35: "PDC Presidente, Result",
+            36: "PDC Diputado, Result",
+            37: "21F Presidente, Result",
+            38: "21F Diputado, Result",
+            39: "MAS IPSP Presidente, Result",
+            40: "MAS IPSP Diputado, Result",
+            41: "UCS Presidente, Result" ,
+            42: "UCS Diputado, Result",
+            43: "MTS Presidente, Result",
+            44: "MTS Diputado, Result",
+            45: "FPV Presidente, Result",
+            46: "FPV Diputado, Result",
+            47: "CC Presidente, Result",
+            48: "CC Diputado, Result"
+        }
+
+
     def combine_lists(self):
           # combine all the info
         #self.partidos_todos = self.partidos.extend(self.partidos_d)
@@ -119,7 +179,7 @@ class ImageHanlder:
         """
         Norm image to constant shape
         """
-        img = cv2.resize(image, (2500, 1600))
+        img = cv2.resize(image, self.normal_shape)
         return img
 
     def cut_image(self, image, p1, p2, simple=False):
@@ -268,15 +328,12 @@ class ImageHanlder:
 
     def main(self, images_list):
         
-
         for i_path in tqdm(images_list, ascii=True, desc="Reading..."):
             print(f"IMAGE : {i_path}")
-            self.interchange = False
-
             try:
                 # Try to open the image
                 #i = "actas/mesas/200081.jpg"
-                img     =   cv2.imread(i_path)
+                img = cv2.imread(i_path)
 
                 if self.fixed:
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -294,15 +351,17 @@ class ImageHanlder:
                 # Find the contours box rectangle for each partido 
                 cont_img, self.outputs = self.find_contour(c_image, i_path)
                 
+                print(self.normal_shape[1], self.normal_shape[0])
+                _writer = Writer(i_path, self.normal_shape[1], self.normal_shape[0])
+
                 for o in self.outputs:
                     # Iterate over the rectangular boxes
-                    for k,v in o.items():
+                    for k, v in o.items():
                         #print(f"WORKING ON {k}")
                         partido_key_id = k  
                         
                         p1, p2 = v
 
-                        self.draw_rectangle_numpy(cont_img, p1,p2 )
 
                         if k in self.partidos_todos:
                             # Mueva Position tira 
@@ -315,129 +374,86 @@ class ImageHanlder:
                             n_p1 = (p1[0] + 310, p1[1])
                             n_p2 = (p2[0] + 215, p2[1])
 
+                        
+
+                        # ADD Result boxes
+                        xmin = p1[0] / self.normal_shape[0]
+                        ymin = p1[1] / self.normal_shape[1]
+
+                        xmax = p2[0] / self.normal_shape[0]
+                        ymax = p2[1] / self.normal_shape[1]
+
+                        xmin_n = n_p1[0] / self.normal_shape[0]
+                        ymin_n = n_p1[1] / self.normal_shape[1]
+
+                        xmax_n = n_p2[0] / self.normal_shape[0]
+                        ymax_n = n_p2[1] / self.normal_shape[1]
+
+
+                        # ::addObject(name, xmin, ymin, xmax, ymax)
+                        label = self.name_maping[int(partido_key_id)]
+                        label_n = self.name_maping_results[int(partido_key_id+24)]
+                        
+
+
+                        _writer.addObject(label, xmin, ymin, 
+                                                xmax, ymax)
+
+                        
+                        _writer.addObject(label_n, xmin_n, ymin_n, 
+                                                xmax_n, ymax_n)
+
+
+                        """
+                        p1 = ( int(xmin*self.normal_shape[0]),
+                                int(ymin * self.normal_shape[1]))
+
+                        p2 = (int(xmax *self.normal_shape[0] ), 
+                                int(ymax*self.normal_shape[1]))
+
+
+                        n_p1 = (int(xmin_n *self.normal_shape[0] ), 
+                                int(ymin_n*self.normal_shape[1]))
+
+                        n_p2 = (int(xmax_n* self.normal_shape[0]),
+                                int(ymax_n*self.normal_shape[1]))
+
+
+                        
+                        
+                        self.draw_rectangle_numpy(cont_img, p1, p2 )
+
                         self.draw_rectangle_numpy(cont_img, n_p1, n_p2 )
-                        
-                        # Letters as image |X|X|X|
-                        #numbers_cout = self.cut_image(cont_img,  n_p1, n_p2)
-
-                        x = n_p1[0]
-                        y = n_p1[1]
-
-                        w = n_p2[0]
-                        h = n_p2[1]
 
 
-                        numbers_cout = cont_img[y:h, x:w]
+                        cv2.putText(cont_img, label, tuple(p1), self.font, 
+                                                        self.fontScale,
+                                                        self.fontColor,
+                                                        self.lineType)
 
-                        # Find again the letters with the contour detector:
-                        l_h, l_w, _ = numbers_cout.shape
-                        
-                        # Attempt to cut each letter
-                        votes = []
+                        cv2.putText(cont_img, label_n, tuple(n_p1), self.font, 
+                                                        self.fontScale,
+                                                        self.fontColor,
+                                                        self.lineType)
 
-                        for i in range(0,3):
+                        """
+                # Write the acta with the number of results drawed on it.
+                base_path = "actas/cuts/"
 
-                            # Sliding x-window
-                            x0 = i*50 + 5
-                            x1 = (i+1)*50 + 5
+                os.makedirs(base_path, exist_ok=True)
+                path = f"{base_path}{filename}"
+                print(f"SAVING IMAGE PRO en {path}")
+                path_label = f"{base_path}{filename_two}_label.xml"
 
-                            # New Points
-                            p1_l = (x0, 0)
-                            p2_l = (x1, l_h)
-                            
-                            #####cv2.rectangle(numbers_cout, p1_l, p2_l, (244, 255, 0), 2)
-                            
-                            ####cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}.jpg", numbers_cout)
-
-                            
-                            # Adjust each letter to his aprox box
-                            if (i == 0):
-                                p1_l_n = (p1_l[0]-5, p1_l[1])
-                                p2_l_n = (p2_l[0], p2_l[1]-5)
-                                letter = self.cut_image(numbers_cout, p1_l_n, p2_l_n, simple=True)
-                            elif (i == 1):
-                                p1_l_n = (p1_l[0]-5, p1_l[1])
-                                p2_l_n = (p2_l[0]-45, p2_l[1]-1) #from  (p2_l[0]-50, p2_l[1]-3)
-                                
-                                letter = self.cut_image(numbers_cout, p1_l_n, p2_l_n,simple=True)
-                            else:
-                                p2_l_n = (p2_l[0]-120, p2_l[1]+10)
-                                p2_l_n = (p2_l[0]+3, p2_l[1]+3)
-                                letter = self.cut_image(numbers_cout, p1_l, p2_l_n, simple=True)
-
-                            # PREDICT
-                            prediction = self.model.main_prediction(letter)
-
-                            votes.append(prediction)
-                            
-                            if self.cut_numbers:
-                                # Path where save the digit numbers
-                                path = "actas/cuts/partidos/numbers/i_letter/"
-                                os.makedirs(path, exist_ok=True)
-                                full_path = f"{path}{k}-{i}-{filename}"
-                                # Save
-                                #print(f"Saving letter to... {full_path}")
-                                #cv2.imwrite(full_path, letter)
-                        
-                        self.data_handler.append({partido_key_id: [votes, v]})       
-                        #  save tiras
-                        #cv2.imwrite(f"actas/cuts/partidos/numbers/{filename_two}-{k}-.jpg", numbers_cout)
-                        
-                    _file_name_log = "results_log"
-
-                    for p in self.data_handler:
-                        for k,v in p.items():
-                            partido_id_name = k
-                            #print(f"KEY {partido_id_name}")
-                            my_predictions, points = v
-
-                            # join number predictions
-                            my_vote = ""
-                            for p in my_predictions:
-                                #print(f"PREDIS {p}")
-                                if p == 10:
-                                    p = ""
-                                my_vote = my_vote + str(p)
-
-                            p1, p2 = points
-
-                            p_text = (p2[0]-15, p2[1])
-
-                            cv2.putText(cont_img, my_vote, tuple(p_text), self.font, 
-                                                            self.fontScale,
-                                                            self.fontColor,
-                                                            self.lineType)
-
-                            cv2.putText(cont_img, 
-                                    str(partido_id_name),
-                                    tuple([x-220,y+50]), 
-                                    self.font, 
-                                    self.fontScale,
-                                    self.fontColor,
-                                    self.lineType)
-
-                            self.write_row_results_log(_file_name_log, 
-                                                            filename,
-                                                            my_vote,
-                                                            partido_id_name)
-
-                    self.data_handler=[]
-
-                    # Write the acta with the number of results drawed on it.
-                if self.draw_results:
-                    base_path = "actas/cuts/"
-
-                    os.makedirs(base_path, exist_ok=True)
-                    path = f"{base_path}{filename}"
-                    print(f"SAVING IMAGE PRO en {path}")
-                    cv2.imwrite(path, cont_img)
+                _writer.save(path_label)
+                cv2.imwrite(path, cont_img)
                 
             except Exception as e:
                 filename = i_path.split("/")[-1]
                 _filename_error = "errorInOpenFile"
                 self.write_row_debug_log(_filename_error, filename, e)
                 print(e)
-            break
+            #break
 
 def load_fixed_data(path):
     with open(f'{path}', 'rb') as filehandle:
