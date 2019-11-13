@@ -329,7 +329,7 @@ class ImageHanlder:
     def main(self, images_list):
         
         for i_path in tqdm(images_list, ascii=True, desc="Reading..."):
-            print(f"IMAGE : {i_path}")
+            ##print(f"IMAGE : {i_path}")
             try:
                 # Try to open the image
                 #i = "actas/mesas/200081.jpg"
