@@ -351,7 +351,6 @@ class ImageHanlder:
                 # Find the contours box rectangle for each partido 
                 cont_img, self.outputs = self.find_contour(c_image, i_path)
                 
-                print(self.normal_shape[1], self.normal_shape[0])
                 _writer = Writer(i_path, self.normal_shape[1], self.normal_shape[0])
 
                 for o in self.outputs:
@@ -442,7 +441,7 @@ class ImageHanlder:
 
                 os.makedirs(base_path, exist_ok=True)
                 path = f"{base_path}{filename}"
-                print(f"SAVING IMAGE PRO en {path}")
+                #print(f"SAVING IMAGE PRO en {path}")
                 path_label = f"{base_path}{filename_two}_label.xml"
 
                 _writer.save(path_label)
