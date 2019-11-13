@@ -482,18 +482,8 @@ if __name__ == "__main__":
     
     fixed_list_path = args.fixes
 
-    if fixed_list_path != "":
-        fixed_list = load_fixed_data(fixed_list_path)
-    else:
-        fixed_list = []
-
-    if (len(fixed_list) > 0):
-        images_list = fixed_list
-        fixed = True
-
-    else:
-        # Images lists...
-        images_list = glob.glob(f"{images_path}*.jpg")
+    # Images lists...
+    images_list = glob.glob(f"{images_path}*.jpg")
 
     image_hanlder = ImageHanlder(cut_numbers=False, # For custom mnist dataset creation
                                 draw_results=True,  # Draw the actas with the result drawed on it
