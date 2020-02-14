@@ -39,7 +39,7 @@ class ImageHanlder:
 
         self.cut_numbers=cut_numbers
         # Instantiate mnist model
-        self.model = MyModel()
+        #self.model = MyModel()
 
         # Bounding rectangles placholder
         self.outputs = []
@@ -361,7 +361,6 @@ class ImageHanlder:
                         
                         p1, p2 = v
 
-
                         if k in self.partidos_todos:
                             # Mueva Position tira 
                             n_p1 = (p1[0] + 340, p1[1])
@@ -376,24 +375,37 @@ class ImageHanlder:
                         
 
                         # ADD Result boxes
-                        xmin = p1[0] / self.normal_shape[0]
-                        ymin = p1[1] / self.normal_shape[1]
 
-                        xmax = p2[0] / self.normal_shape[0]
-                        ymax = p2[1] / self.normal_shape[1]
+                        ## Normalize
+                        # xmin = p1[0] / self.normal_shape[0]
+                        # ymin = p1[1] / self.normal_shape[1]
 
-                        xmin_n = n_p1[0] / self.normal_shape[0]
-                        ymin_n = n_p1[1] / self.normal_shape[1]
+                        # xmax = p2[0] / self.normal_shape[0]
+                        # ymax = p2[1] / self.normal_shape[1]
 
-                        xmax_n = n_p2[0] / self.normal_shape[0]
-                        ymax_n = n_p2[1] / self.normal_shape[1]
+                        # xmin_n = n_p1[0] / self.normal_shape[0]
+                        # ymin_n = n_p1[1] / self.normal_shape[1]
+
+                        # xmax_n = n_p2[0] / self.normal_shape[0]
+                        # ymax_n = n_p2[1] / self.normal_shape[1]
+
+
+                        xmin = p1[0] 
+                        ymin = p1[1] 
+                        xmax = p2[0] 
+                        ymax = p2[1]
+
+                        xmin_n = n_p1[0] 
+                        ymin_n = n_p1[1] 
+
+                        xmax_n = n_p2[0] 
+                        ymax_n = n_p2[1] 
 
 
                         # ::addObject(name, xmin, ymin, xmax, ymax)
                         label = self.name_maping[int(partido_key_id)]
                         label_n = self.name_maping_results[int(partido_key_id+24)]
                         
-
 
                         _writer.addObject(label, xmin, ymin, 
                                                 xmax, ymax)
@@ -425,15 +437,20 @@ class ImageHanlder:
                         self.draw_rectangle_numpy(cont_img, n_p1, n_p2 )
 
 
+                        p1 = ( int(xmin*self.normal_shape[0]),
+                                int(ymin * self.normal_shape[1]-7))
+                        n_p1 = (int(xmin_n *self.normal_shape[0] ), 
+                                int(ymin_n*self.normal_shape[1]-7))
+
                         cv2.putText(cont_img, label, tuple(p1), self.font, 
                                                         self.fontScale,
                                                         self.fontColor,
                                                         self.lineType)
 
-                        cv2.putText(cont_img, label_n, tuple(n_p1), self.font, 
-                                                        self.fontScale,
-                                                        self.fontColor,
-                                                        self.lineType)
+                        # cv2.putText(cont_img, label_n, tuple(n_p1), self.font, 
+                        #                                 self.fontScale,
+                        #                                 self.fontColor,
+                        #                                 self.lineType)
 
                         """
                 # Write the acta with the number of results drawed on it.

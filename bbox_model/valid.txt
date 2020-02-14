@@ -1,1 +1,1 @@
-../actas/cuts/211851
+/home/stanlee321/Desktop/DeepLearning/elecciones/actas/cuts/211851_label.xml
